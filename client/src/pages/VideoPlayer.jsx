@@ -6,65 +6,63 @@ import { AuthContext } from '../context/AuthContext';
 import Comment from '../components/Comment';
 
 const VideoPlayer = () => {
-  const { id } = useParams();
+  const { id } = useParams(); // videoId from URL
   const { user } = useContext(AuthContext);
 
   const [video, setVideo] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [likes, setLikes] = useState(0);
-  const [dislikes, setDislikes] = useState(0);
-  const [userReaction, setUserReaction] = useState(null);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isDisliked, setIsDisliked] = useState(false);
 
   useEffect(() => {
     const fetchVideo = async () => {
       try {
         const res = await axios.get(`/videos/${id}`);
-        setVideo(res.data);
-        setLikes(res.data.likes?.length || 0);
-        setDislikes(res.data.dislikes?.length || 0);
+        const data = res.data;
+        setVideo(data);
+
+        if (user) {
+          setIsLiked(data.likes.includes(user.id));
+          setIsDisliked(data.dislikes.includes(user.id));
+        }
+
         setLoading(false);
       } catch (err) {
-        console.error('Error fetching video by ID:', err);
+        console.error('Error fetching video:', err);
         setLoading(false);
       }
     };
 
     fetchVideo();
-  }, [id]);
+  }, [id, user]);
 
   const handleLike = async () => {
+    if (!user) return alert("Please sign in to like the video.");
     try {
-      const res = await axios.put(
-        `/videos/${id}/like`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-      setLikes(res.data.likes.length);
-      setDislikes(res.data.dislikes.length);
-      setUserReaction('like');
+      await axios.put(`/videos/like/${id}`);
+      setIsLiked(true);
+      setIsDisliked(false);
+      setVideo(prev => ({
+        ...prev,
+        likes: [...new Set([...prev.likes, user.id])],
+        dislikes: prev.dislikes.filter(uid => uid !== user.id),
+      }));
     } catch (err) {
       console.error('Error liking video:', err);
     }
   };
 
   const handleDislike = async () => {
+    if (!user) return alert("Please sign in to dislike the video.");
     try {
-      const res = await axios.put(
-        `/videos/${id}/dislike`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        }
-      );
-      setLikes(res.data.likes.length);
-      setDislikes(res.data.dislikes.length);
-      setUserReaction('dislike');
+      await axios.put(`/videos/dislike/${id}`);
+      setIsDisliked(true);
+      setIsLiked(false);
+      setVideo(prev => ({
+        ...prev,
+        dislikes: [...new Set([...prev.dislikes, user.id])],
+        likes: prev.likes.filter(uid => uid !== user.id),
+      }));
     } catch (err) {
       console.error('Error disliking video:', err);
     }
@@ -91,29 +89,24 @@ const VideoPlayer = () => {
       </p>
       <p className="text-base text-gray-200 mb-6">{video.description}</p>
 
-      {/* Like/Dislike Buttons */}
-      <div className="flex items-center gap-4 mb-6">
+      {/* 👍 Like / 👎 Dislike Buttons */}
+      <div className="flex items-center space-x-4 mt-2">
         <button
           onClick={handleLike}
-          className={`flex items-center gap-2 px-4 py-2 rounded-full ${
-            userReaction === 'like' ? 'bg-blue-600' : 'bg-gray-700'
-          } text-white`}
+          className={`flex items-center space-x-1 ${isLiked ? 'text-blue-500' : 'text-gray-400'}`}
         >
-          <FaThumbsUp /> {likes}
+          <FaThumbsUp /> <span>{video.likes.length}</span>
         </button>
         <button
           onClick={handleDislike}
-          className={`flex items-center gap-2 px-4 py-2 rounded-full ${
-            userReaction === 'dislike' ? 'bg-red-600' : 'bg-gray-700'
-          } text-white`}
+          className={`flex items-center space-x-1 ${isDisliked ? 'text-red-500' : 'text-gray-400'}`}
         >
-          <FaThumbsDown /> {dislikes}
+          <FaThumbsDown /> <span>{video.dislikes.length}</span>
         </button>
       </div>
 
-      {/* Comments */}
+      {/* 🗨️ Comments */}
       <Comment videoId={video._id} user={user} />
-
     </div>
   );
 };
