@@ -39,49 +39,44 @@ export const uploadVideo = async (req, res) => {
   }
 };
 
+// controllers/videoController.js
+
 export const likeVideo = async (req, res) => {
+  const userId = req.user.id;
+  const videoId = req.params.id;
+
   try {
-    const { videoId } = req.params;
-    const userId = req.user.id;
-
-    const video = await Video.findById(videoId);
-
-    if (!video) return res.status(404).json({ message: 'Video not found' });
-
-    // If already liked, remove like
-    if (video.likes.includes(userId)) {
-      video.likes.pull(userId);
-    } else {
-      video.likes.push(userId);
-      video.dislikes.pull(userId); // Remove dislike if exists
-    }
-
-    await video.save();
+    const video = await Video.findByIdAndUpdate(
+      videoId,
+      {
+        $addToSet: { likes: userId },
+        $pull: { dislikes: userId },
+      },
+      { new: true }
+    );
+    if (!video) return res.status(404).json({ error: 'Video not found' });
     res.status(200).json(video);
   } catch (err) {
-    res.status(500).json({ message: 'Error liking video' });
+    res.status(500).json({ error: 'Failed to like video' });
   }
 };
 
 export const dislikeVideo = async (req, res) => {
+  const userId = req.user.id;
+  const videoId = req.params.id;
+
   try {
-    const { videoId } = req.params;
-    const userId = req.user.id;
-
-    const video = await Video.findById(videoId);
-
-    if (!video) return res.status(404).json({ message: 'Video not found' });
-
-    if (video.dislikes.includes(userId)) {
-      video.dislikes.pull(userId);
-    } else {
-      video.dislikes.push(userId);
-      video.likes.pull(userId);
-    }
-
-    await video.save();
+    const video = await Video.findByIdAndUpdate(
+      videoId,
+      {
+        $addToSet: { dislikes: userId },
+        $pull: { likes: userId },
+      },
+      { new: true }
+    );
+    if (!video) return res.status(404).json({ error: 'Video not found' });
     res.status(200).json(video);
   } catch (err) {
-    res.status(500).json({ message: 'Error disliking video' });
+    res.status(500).json({ error: 'Failed to dislike video' });
   }
 };
