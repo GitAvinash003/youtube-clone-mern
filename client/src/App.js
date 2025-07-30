@@ -3,6 +3,9 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
+
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -16,6 +19,8 @@ function App() {
           <div style={{ paddingTop: '60px' }}>
             <Routes>
               <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
             </Routes>
           </div>
         </div>
@@ -25,3 +30,4 @@ function App() {
 }
 
 export default App;
+
