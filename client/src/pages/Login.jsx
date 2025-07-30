@@ -1,94 +1,87 @@
 import React, { useState, useContext } from 'react';
 import axios from '../api/axios';
 import { AuthContext } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
   const [form, setForm] = useState({ email: '', password: '' });
+  const [loading, setLoading] = useState(false);
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!form.email || !form.password) {
+      alert('Please fill in both email and password.');
+      return;
+    }
+
     try {
+      setLoading(true);
       const res = await axios.post('/auth/login', form);
       login(res.data.user, res.data.token);
-      navigate('/'); // redirect to Home after login
+      navigate('/');
     } catch (err) {
       alert(err.response?.data?.message || 'Login failed');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={styles.container}>
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <h2 style={styles.title}>Sign in to YouTube Clone</h2>
+    <div className="flex justify-center items-center h-screen bg-gray-100">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-10 rounded-lg shadow-md w-80 text-center"
+      >
+        <h2 className="mb-6 text-2xl font-semibold text-gray-800">
+          Sign in to YouTube Clone
+        </h2>
+
         <input
           name="email"
+          type="email"
           placeholder="Email"
+          value={form.email}
           onChange={handleChange}
-          style={styles.input}
+          required
+          className="w-full px-4 py-3 mb-4 rounded border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          autoComplete="email"
         />
+
         <input
           name="password"
           type="password"
           placeholder="Password"
+          value={form.password}
           onChange={handleChange}
-          style={styles.input}
+          required
+          className="w-full px-4 py-3 mb-6 rounded border border-gray-300 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          autoComplete="current-password"
         />
-        <button type="submit" style={styles.button}>Sign In</button>
-        <p style={styles.text}>
-          Don’t have an account? <a href="/register">Register</a>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-3 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600 disabled:bg-blue-300"
+        >
+          {loading ? 'Signing In...' : 'Sign In'}
+        </button>
+
+        <p className="mt-4 text-sm text-gray-700">
+          Don’t have an account?{' '}
+          <Link to="/register" className="text-blue-500 hover:underline">
+            Register
+          </Link>
         </p>
       </form>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100vh',
-    background: '#f2f2f2',
-  },
-  form: {
-    background: 'white',
-    padding: '40px',
-    borderRadius: '8px',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-    width: '300px',
-    textAlign: 'center',
-  },
-  title: {
-    marginBottom: '20px',
-    color: '#202020',
-  },
-  input: {
-    width: '100%',
-    padding: '10px',
-    marginBottom: '15px',
-    borderRadius: '4px',
-    border: '1px solid #ccc',
-    fontSize: '14px',
-  },
-  button: {
-    width: '100%',
-    padding: '10px',
-    background: '#3ea6ff',
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    fontWeight: 'bold',
-    cursor: 'pointer',
-  },
-  text: {
-    marginTop: '10px',
-    fontSize: '13px',
-  },
 };
 
 export default Login;
