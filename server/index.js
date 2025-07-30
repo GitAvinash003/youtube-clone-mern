@@ -3,7 +3,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import authRoutes from './routes/auth.js'; // make sure filename is correct
+import authRoutes from './routes/authRoutes.js'; // make sure filename is correct
 import videoRoutes from './routes/video.js';
 
 
