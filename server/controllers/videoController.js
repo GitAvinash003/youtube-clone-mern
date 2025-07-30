@@ -1,5 +1,23 @@
 import Video from '../models/Video.js';
 
+
+export const getVideoById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const video = await Video.findById(id);
+
+    if (!video) {
+      return res.status(404).json({ message: 'Video not found' });
+    }
+
+    res.status(200).json(video);
+  } catch (err) {
+    console.error('Error fetching video by ID:', err.message);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
 export const getAllVideos = async (req, res) => {
   try {
     const videos = await Video.find();

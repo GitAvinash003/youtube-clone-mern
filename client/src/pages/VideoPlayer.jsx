@@ -1,14 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from '../api/axios';
 import { FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
+import { AuthContext } from '../context/AuthContext';
 
 const VideoPlayer = () => {
   const { id } = useParams();
+  const { user } = useContext(AuthContext); // Ensure AuthContext provides { user: { token, ... } }
+
   const [video, setVideo] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
-  const [userReaction, setUserReaction] = useState(null); // 'like' | 'dislike' | null
+  const [userReaction, setUserReaction] = useState(null); // 'like' or 'dislike'
+
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
 
@@ -17,14 +22,69 @@ const VideoPlayer = () => {
       try {
         const res = await axios.get(`/videos/${id}`);
         setVideo(res.data);
+        setLikes(res.data.likes?.length || 0);
+        setDislikes(res.data.dislikes?.length || 0);
+        setLoading(false);
       } catch (err) {
-        console.error('Failed to load video:', err);
+        console.error('Error fetching video by ID:', err);
+        setLoading(false);
       }
     };
+
     fetchVideo();
   }, [id]);
 
-  if (!video) return <h2 className="text-white text-center mt-10">Loading...</h2>;
+  const handleAddComment = () => {
+    if (newComment.trim()) {
+      const commentObj = {
+        text: newComment,
+        date: new Date(),
+      };
+      setComments([commentObj, ...comments]);
+      setNewComment('');
+    }
+  };
+
+  const handleLike = async () => {
+    try {
+      const res = await axios.put(
+        `/videos/${id}/like`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+      setLikes(res.data.likes.length);
+      setDislikes(res.data.dislikes.length);
+      setUserReaction('like');
+    } catch (err) {
+      console.error('Error liking video:', err);
+    }
+  };
+
+  const handleDislike = async () => {
+    try {
+      const res = await axios.put(
+        `/videos/${id}/dislike`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+      setLikes(res.data.likes.length);
+      setDislikes(res.data.dislikes.length);
+      setUserReaction('dislike');
+    } catch (err) {
+      console.error('Error disliking video:', err);
+    }
+  };
+
+  if (loading) return <h2 className="text-white text-center mt-10">Loading...</h2>;
+  if (!video) return <h2 className="text-red-500 text-center mt-10">Video not found</h2>;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 text-white">
@@ -44,48 +104,27 @@ const VideoPlayer = () => {
       </p>
       <p className="text-base text-gray-200 mb-6">{video.description}</p>
 
-      {/* Like/Dislike */}
+      {/* Like/Dislike Buttons */}
       <div className="flex items-center gap-4 mb-6">
         <button
-          className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold ${
-            userReaction === 'like' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'
-          }`}
-          onClick={() => {
-            if (userReaction === 'like') {
-              setUserReaction(null);
-              setLikes((prev) => prev - 1);
-            } else {
-              setUserReaction('like');
-              setLikes((prev) => prev + 1);
-              if (userReaction === 'dislike') setDislikes((prev) => prev - 1);
-            }
-          }}
+          onClick={handleLike}
+          className={`flex items-center gap-2 px-4 py-2 rounded-full ${
+            userReaction === 'like' ? 'bg-blue-600' : 'bg-gray-700'
+          } text-white`}
         >
-          <FaThumbsUp />
-          {likes}
+          <FaThumbsUp /> {likes}
         </button>
-
         <button
-          className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold ${
-            userReaction === 'dislike' ? 'bg-red-600 text-white' : 'bg-gray-700 text-gray-300'
-          }`}
-          onClick={() => {
-            if (userReaction === 'dislike') {
-              setUserReaction(null);
-              setDislikes((prev) => prev - 1);
-            } else {
-              setUserReaction('dislike');
-              setDislikes((prev) => prev + 1);
-              if (userReaction === 'like') setLikes((prev) => prev - 1);
-            }
-          }}
+          onClick={handleDislike}
+          className={`flex items-center gap-2 px-4 py-2 rounded-full ${
+            userReaction === 'dislike' ? 'bg-red-600' : 'bg-gray-700'
+          } text-white`}
         >
-          <FaThumbsDown />
-          {dislikes}
+          <FaThumbsDown /> {dislikes}
         </button>
       </div>
 
-      {/* Comments Section */}
+      {/* Comments */}
       <div className="mb-6">
         <h3 className="text-lg font-semibold mb-2">Comments</h3>
 
@@ -98,12 +137,7 @@ const VideoPlayer = () => {
             className="w-full sm:w-auto flex-1 px-4 py-2 rounded-md bg-[#2a2a2a] text-white border border-gray-600 focus:outline-none"
           />
           <button
-            onClick={() => {
-              if (newComment.trim()) {
-                setComments([{ text: newComment, date: new Date() }, ...comments]);
-                setNewComment('');
-              }
-            }}
+            onClick={handleAddComment}
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
           >
             Comment
@@ -118,7 +152,7 @@ const VideoPlayer = () => {
             <div key={idx} className="bg-[#1f1f1f] p-3 rounded-lg">
               <p className="text-sm text-white mb-1">{comment.text}</p>
               <p className="text-xs text-gray-500">
-                {comment.date.toLocaleString()}
+                {new Date(comment.date).toLocaleString()}
               </p>
             </div>
           ))}

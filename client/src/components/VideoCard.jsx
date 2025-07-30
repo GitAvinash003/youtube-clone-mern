@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 const VideoCard = ({ video }) => {
   return (
     <Link
-      to={`/video/${video.videoId}`}
+      to={`/video/${video._id}`}
       className="w-64 bg-[#282828] rounded-lg overflow-hidden shadow hover:scale-105 transition"
     >
       <img
