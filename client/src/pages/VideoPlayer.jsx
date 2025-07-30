@@ -3,19 +3,17 @@ import { useParams } from 'react-router-dom';
 import axios from '../api/axios';
 import { FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
 import { AuthContext } from '../context/AuthContext';
+import Comment from '../components/Comment';
 
 const VideoPlayer = () => {
   const { id } = useParams();
-  const { user } = useContext(AuthContext); // Ensure AuthContext provides { user: { token, ... } }
+  const { user } = useContext(AuthContext);
 
   const [video, setVideo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
-  const [userReaction, setUserReaction] = useState(null); // 'like' or 'dislike'
-
-  const [comments, setComments] = useState([]);
-  const [newComment, setNewComment] = useState('');
+  const [userReaction, setUserReaction] = useState(null);
 
   useEffect(() => {
     const fetchVideo = async () => {
@@ -33,17 +31,6 @@ const VideoPlayer = () => {
 
     fetchVideo();
   }, [id]);
-
-  const handleAddComment = () => {
-    if (newComment.trim()) {
-      const commentObj = {
-        text: newComment,
-        date: new Date(),
-      };
-      setComments([commentObj, ...comments]);
-      setNewComment('');
-    }
-  };
 
   const handleLike = async () => {
     try {
@@ -125,39 +112,8 @@ const VideoPlayer = () => {
       </div>
 
       {/* Comments */}
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold mb-2">Comments</h3>
+      <Comment videoId={video._id} user={user} />
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mb-4">
-          <input
-            type="text"
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Add a public comment..."
-            className="w-full sm:w-auto flex-1 px-4 py-2 rounded-md bg-[#2a2a2a] text-white border border-gray-600 focus:outline-none"
-          />
-          <button
-            onClick={handleAddComment}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-          >
-            Comment
-          </button>
-        </div>
-
-        <div className="space-y-4">
-          {comments.length === 0 && (
-            <p className="text-gray-400 text-sm">No comments yet.</p>
-          )}
-          {comments.map((comment, idx) => (
-            <div key={idx} className="bg-[#1f1f1f] p-3 rounded-lg">
-              <p className="text-sm text-white mb-1">{comment.text}</p>
-              <p className="text-xs text-gray-500">
-                {new Date(comment.date).toLocaleString()}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 };

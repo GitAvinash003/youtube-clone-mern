@@ -8,103 +8,53 @@ const Header = ({ toggleSidebar, onSearch }) => {
   const navigate = useNavigate();
 
   return (
-    <header style={styles.header}>
-      <button onClick={toggleSidebar} style={styles.menu}>☰</button>
-      <h1 style={styles.logo}>YouTube Clone</h1>
+    <header className="fixed top-0 left-0 right-0 z-50 bg-[#202020]  text-white flex items-center justify-between px-4 py-2 shadow-md">
+      {/* Left: Menu + Logo */}
+      <div className="flex items-center gap-4">
+        <button
+          onClick={toggleSidebar}
+          className="text-2xl"
+          aria-label="Toggle Sidebar"
+        >
+          ☰
+        </button>
+        <h1 className="text-xl font-semibold whitespace-nowrap">YouTube Clone</h1>
+      </div>
 
-      <input
-        type="text"
-        placeholder="Search"
-        onChange={(e) => onSearch(e.target.value)}
-        style={styles.search}
-      />
+      {/* Middle: Search Bar */}
+      <div className="hidden sm:flex flex-1 justify-center">
+        <input
+          type="text"
+          placeholder="Search"
+          onChange={(e) => onSearch(e.target.value)}
+          className="w-full max-w-md px-4 py-2 rounded-full bg-[#121212] text-white placeholder-gray-400 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        />
+      </div>
 
-      <div style={styles.auth}>
+      {/* Right: Auth */}
+      <div className="flex items-center gap-3">
         {user ? (
           <>
-            <span style={styles.username}>👤 {user.username}</span>
-            <button onClick={logout} style={styles.logout}>Logout</button>
+            <span className="text-sm font-medium hidden sm:inline">👤 {user.username}</span>
+            <button
+              onClick={logout}
+              className="px-3 py-1 text-sm bg-gray-600 hover:bg-gray-700 rounded text-white"
+            >
+              Logout
+            </button>
           </>
         ) : (
-          <button onClick={() => navigate('/login')} style={styles.signIn}>
-            <FaUserCircle style={styles.signInIcon} />
+          <button
+            onClick={() => navigate('/login')}
+            className="flex items-center gap-2 px-3 py-1 text-sm text-blue-400 border border-blue-400 rounded-full hover:bg-blue-500 hover:text-white transition-colors"
+          >
+            <FaUserCircle className="text-lg" />
             Sign in
           </button>
         )}
       </div>
     </header>
   );
-};
-
-const styles = {
-  header: {
-    height: '60px',
-    background: '#202020',
-    color: 'white',
-    display: 'flex',
-    alignItems: 'center',
-    padding: '0 20px',
-    justifyContent: 'space-between',
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 1000,
-    boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-  },
-  search: {
-    padding: '6px 10px',
-    borderRadius: '20px',
-    border: '1px solid #ccc',
-    background: '#121212',
-    color: 'white',
-    outline: 'none',
-    margin: '0 20px',
-    width: '250px',
-  },
-  menu: {
-    fontSize: '24px',
-    background: 'transparent',
-    border: 'none',
-    color: 'white',
-  },
-  logo: {
-    margin: 0,
-    fontSize: '20px',
-  },
-  auth: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-  },
-  username: {
-    fontWeight: 'bold',
-    fontSize: '14px',
-  },
-  signIn: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '6px 12px',
-    background: 'transparent',
-    color: '#3ea6ff',
-    border: '1px solid #3ea6ff',
-    borderRadius: '20px',
-    fontWeight: '500',
-    cursor: 'pointer',
-    fontSize: '14px',
-  },
-  signInIcon: {
-    fontSize: '18px',
-  },
-  logout: {
-    padding: '6px 10px',
-    background: '#555',
-    border: 'none',
-    borderRadius: '4px',
-    color: 'white',
-    cursor: 'pointer',
-  },
 };
 
 export default Header;
