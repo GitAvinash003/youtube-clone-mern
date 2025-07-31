@@ -7,6 +7,7 @@ import authRoutes from './routes/authRoutes.js'; // make sure filename is correc
 import videoRoutes from './routes/video.js';
 import commentRoutes from './routes/commentRoutes.js';
 import channelRoutes from './routes/channelRoutes.js';
+import channelVideosRoutes from './routes/channelVideosRoutes.js';
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.use('/api/videos', videoRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/channels', channelRoutes);
 
+app.use('/api/channel-videos', channelVideosRoutes);
 
 
 // Root route

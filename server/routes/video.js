@@ -1,6 +1,6 @@
 // routes/video.js
 import express from 'express';
-import { getAllVideos, uploadVideo,getVideoById,  } from '../controllers/videoController.js';
+import { getAllVideos, uploadVideo,getVideoById,deleteVideo,updateVideo } from '../controllers/videoController.js';
 import { likeVideo, dislikeVideo } from '../controllers/videoController.js';
 import verifyToken from '../middleware/verifyToken.js';
 
@@ -28,6 +28,10 @@ router.get('/channel/:channelId', async (req, res) => {
   }
 });
 
+// DELETE /api/videos/:id
+router.delete('/:id', verifyToken, deleteVideo);
+// routes/videoRoutes.js or channelVideosRoutes.js
+router.put('/:id', verifyToken, updateVideo);
 
 
 export default router;
