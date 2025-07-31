@@ -14,20 +14,24 @@ const ChannelVideoPage = () => {
         const res = await axios.get(`/videos/channel/${channelId}`);
         setVideos(res.data);
       } catch (err) {
-        console.error("Error loading channel videos", err);
+        console.error('Error loading channel videos:', err.response?.data || err.message);
       }
     };
+
     fetchChannelVideos();
   }, [channelId]);
 
   const handleDelete = async (videoId) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this video?');
+    if (!confirmDelete) return;
+
     try {
-      await axios.delete(`/videos/${videoId}`, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      await axios.delete(`/videos/${videoId}`); // ✅ Correct route
       setVideos((prev) => prev.filter((video) => video._id !== videoId));
+      alert('Video deleted successfully');
     } catch (err) {
-      console.error("Failed to delete video", err);
+      console.error('Failed to delete video:', err.response?.data || err.message);
+      alert('Failed to delete video');
     }
   };
 

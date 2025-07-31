@@ -12,6 +12,9 @@ import CreateChannel from './pages/CreateChannel';
 import ChannelPage from './pages/ChannelPage';
 import EditChannel from './pages/EditChannel';
 //import EditVideo from './pages/EditVideo';
+import UploadVideo from './pages/UploadVideo';
+import EditVideo from './pages/EditVideo';
+
 
 
 
@@ -43,6 +46,8 @@ function App() {
               <Route path="/channel/:channelId" element={<ChannelPage />} />
               <Route path="/edit-channel/:id" element={<EditChannel />} />
               <Route path="/my-channel" element={<ChannelPage />} />
+              <Route path="/upload-video" element={<UploadVideo />} />
+              <Route path="/edit-video/:videoId" element={<EditVideo />} />
 
 
             </Routes>
