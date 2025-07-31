@@ -6,7 +6,7 @@ import cors from 'cors';
 import authRoutes from './routes/authRoutes.js'; // make sure filename is correct
 import videoRoutes from './routes/video.js';
 import commentRoutes from './routes/commentRoutes.js';
-
+import channelRoutes from './routes/channelRoutes.js';
 
 dotenv.config();
 
@@ -23,11 +23,16 @@ app.use(cors({
 app.use(express.json());
 
 
+
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/videos', videoRoutes);
 
 app.use('/api/comments', commentRoutes);
+app.use('/api/channels', channelRoutes);
+
+
 
 // Root route
 app.get('/', (req, res) => {

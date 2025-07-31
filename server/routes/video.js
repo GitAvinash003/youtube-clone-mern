@@ -18,6 +18,17 @@ router.get('/:id', getVideoById);
 router.put('/like/:id', verifyToken, likeVideo);
 router.put('/dislike/:id', verifyToken, dislikeVideo);
 
+// Get videos by channelId
+router.get('/channel/:channelId', async (req, res) => {
+  try {
+    const videos = await Video.find({ channelId: req.params.channelId });
+    res.status(200).json(videos);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 
 export default router;
 

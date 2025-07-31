@@ -80,3 +80,14 @@ export const dislikeVideo = async (req, res) => {
     res.status(500).json({ error: 'Failed to dislike video' });
   }
 };
+
+
+export const getVideosByChannel = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const videos = await Video.find({ userId });
+    res.status(200).json(videos);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error while fetching channel videos' });
+  }
+};
