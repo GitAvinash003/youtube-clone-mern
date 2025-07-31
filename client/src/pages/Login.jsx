@@ -25,6 +25,8 @@ const Login = () => {
       setLoading(true);
       const res = await axios.post('/auth/login', form);
       login(res.data.user, res.data.token);
+      // ✅ Store token separately so Axios interceptor can access it
+      localStorage.setItem('token', res.data.token);
       navigate('/');
     } catch (err) {
       alert(err.response?.data?.message || 'Login failed');

@@ -1,80 +1,73 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from '../api/axios';
-import VideoCard from '../components/VideoCard';
-
-// Dummy channel data (can remove if using backend response)
-export const dummyChannel = {
-  id: 'channel01',
-  name: 'CodeWithJohn',
-  avatarUrl: 'https://i.pravatar.cc/150?img=3',
-  subscribers: 21500,
-  description: 'Coding tutorials on React, Node.js, and more!',
-};
+import { AuthContext } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const Channel = () => {
-  const { id } = useParams(); // channelId from route
-  const [channel, setChannel] = useState(null);
+  const { user } = useContext(AuthContext);
   const [videos, setVideos] = useState([]);
-  const [isSubscribed, setIsSubscribed] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchChannelData = async () => {
+    const fetchUserVideos = async () => {
+      if (!user) return;
+
       try {
-        // If using backend:
-        const res = await axios.get(`/channels/${id}`);
-        setChannel(res.data.channel);
-        setVideos(res.data.videos);
-
-        // You can also get subscription status from backend here if needed
+        const res = await axios.get(`/videos/channel/${user.id}/videos`);
+        setVideos(res.data);
       } catch (err) {
-        console.error('Failed to load channel:', err);
-
-        // Fallback to dummy data
-        setChannel(dummyChannel);
-        setVideos([]);
+        console.error('Failed to fetch channel videos:', err);
       }
     };
-    fetchChannelData();
-  }, [id]);
 
-  if (!channel) return <h2 className="text-white text-center mt-10">Loading...</h2>;
+    fetchUserVideos();
+  }, [user]);
+
+  const handleEdit = (videoId) => {
+    navigate(`/edit-video/${videoId}`);
+  };
+
+  const handleDelete = async (videoId) => {
+    try {
+      await axios.delete(`/videos/${videoId}`);
+      setVideos((prev) => prev.filter((video) => video._id !== videoId));
+    } catch (err) {
+      console.error('Failed to delete video:', err);
+    }
+  };
+   
+
+  if (!user) return <h2 className="text-white text-center mt-10">Sign in to view your channel</h2>;
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 text-white">
-      {/* Channel Info */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-        <div className="flex items-center gap-4">
-          <img
-            src={channel.avatarUrl}
-            alt="Channel Avatar"
-            className="w-16 h-16 rounded-full object-cover"
-          />
-          <div>
-            <h2 className="text-2xl font-semibold">{channel.name}</h2>
-            <p className="text-gray-400 text-sm">{channel.subscribers} subscribers</p>
-          </div>
+      <h2 className="text-2xl font-bold mb-4">My Channel</h2>
+      {videos.length === 0 ? (
+        <p className="text-gray-400">No videos uploaded yet.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {videos.map((video) => (
+            <div key={video._id} className="bg-[#2a2a2a] p-4 rounded">
+              <iframe
+                src={video.videoUrl}
+                title={video.title}
+                className="w-full h-48 mb-2 rounded"
+                allowFullScreen
+              />
+              <h3 className="text-lg font-semibold">{video.title}</h3>
+              <p className="text-sm text-gray-400 mb-2">{video.description}</p>
+              <div className="flex gap-2">
+                <button onClick={() => handleEdit(video._id)} className="bg-blue-500 px-3 py-1 rounded">
+                  Edit
+                </button>
+                <button onClick={() => handleDelete(video._id)} className="bg-red-500 px-3 py-1 rounded">
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
-
-        <button
-          onClick={() => setIsSubscribed((prev) => !prev)}
-          className={`px-4 py-2 rounded-full text-sm font-semibold ${
-            isSubscribed ? 'bg-gray-600 text-white' : 'bg-red-600 text-white'
-          }`}
-        >
-          {isSubscribed ? 'Subscribed' : 'Subscribe'}
-        </button>
-      </div>
-
-      {/* Videos by Channel */}
-      <div className="flex flex-wrap gap-6">
-        {videos.length === 0 && (
-          <p className="text-gray-400 text-sm">This channel has no videos yet.</p>
-        )}
-        {videos.map((video) => (
-          <VideoCard key={video.videoId} video={video} />
-        ))}
-      </div>
+      )}
     </div>
   );
 };

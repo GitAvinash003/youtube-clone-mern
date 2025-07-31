@@ -7,6 +7,13 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import VideoPlayer from './pages/VideoPlayer';
 import Channel from './pages/Channel';
+//import ChannelVideoPage from './pages/ChannelVideoPage';
+import CreateChannel from './pages/CreateChannel';
+import ChannelPage from './pages/ChannelPage';
+import EditChannel from './pages/EditChannel';
+//import EditVideo from './pages/EditVideo';
+
+
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -27,9 +34,17 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
 
-              
+
               <Route path="/video/:id" element={<VideoPlayer />} />
-              <Route path="/channel/:id" element={<Channel />} />
+              <Route path="/channel/:userId/videos" element={<Channel />} />
+              
+
+              <Route path="/create-channel" element={<CreateChannel/>} /> 
+              <Route path="/channel/:channelId" element={<ChannelPage />} />
+              <Route path="/edit-channel/:id" element={<EditChannel />} />
+              <Route path="/my-channel" element={<ChannelPage />} />
+
+
             </Routes>
           </div>
         </div>
