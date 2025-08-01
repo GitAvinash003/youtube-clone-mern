@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from '../api/axios';
+import axios from '../api/axios'; // Your auth-aware axios instance
 import { useNavigate } from 'react-router-dom';
 
 const CreateChannel = () => {
@@ -8,21 +8,33 @@ const CreateChannel = () => {
     description: '',
     channelBanner: '',
   });
-
   const navigate = useNavigate();
 
   const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const res = await axios.post('/channels', form);
+      // Backend may nest channel inside data.channel
+      const id =
+        res.data.channel?._id?.toString() || res.data._id?.toString();
+
+      if (!id) {
+        alert('Channel created, but ID not found — check server response.');
+        return;
+      }
+
       alert('Channel created!');
-      navigate(`/channel/${res.data._id}`);
+      navigate(`/channel/${id}`);
     } catch (err) {
       console.error('Error creating channel:', err.response?.data);
-      alert(err.response?.data?.message || 'Failed to create channel');
+      alert(
+        err.response?.data?.message ||
+          JSON.stringify(err.response?.data) ||
+          'Failed to create channel'
+      );
     }
   };
 
@@ -36,52 +48,45 @@ const CreateChannel = () => {
           Create Your Channel
         </h2>
 
-        <div className="mb-4">
-          <label className="block mb-2 text-sm font-medium text-gray-300">
-            Channel Name
-          </label>
-          <input
-            type="text"
-            name="channelName"
-            value={form.channelName}
-            onChange={handleChange}
-            required
-            placeholder="e.g. Code with Avinash"
-            className="w-full px-4 py-2 bg-[#2a2a2a] text-white border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+        {/* Channel Name */}
+        <label className="block mb-2 text-sm text-gray-300">
+          Channel Name
+        </label>
+        <input
+          name="channelName"
+          value={form.channelName}
+          onChange={handleChange}
+          required
+          placeholder="e.g. Code with Avinash"
+          className="w-full mb-4 px-4 py-2 bg-[#2a2a2a] text-white border rounded focus:ring-2 focus:ring-blue-500"
+        />
 
-        <div className="mb-4">
-          <label className="block mb-2 text-sm font-medium text-gray-300">
-            Description
-          </label>
-          <textarea
-            name="description"
-            value={form.description}
-            onChange={handleChange}
-            rows={3}
-            placeholder="Tell viewers what your channel is about..."
-            className="w-full px-4 py-2 bg-[#2a2a2a] text-white border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+        {/* Description */}
+        <label className="block mb-2 text-sm text-gray-300">Description</label>
+        <textarea
+          name="description"
+          value={form.description}
+          onChange={handleChange}
+          rows="3"
+          placeholder="Tell viewers what your channel is about..."
+          className="w-full mb-4 px-4 py-2 bg-[#2a2a2a] text-white border rounded focus:ring-2 focus:ring-blue-500"
+        />
 
-        <div className="mb-6">
-          <label className="block mb-2 text-sm font-medium text-gray-300">
-            Channel Banner URL
-          </label>
-          <input
-            type="text"
-            name="channelBanner"
-            value={form.channelBanner}
-            onChange={handleChange}
-            placeholder="https://example.com/banner.jpg"
-            className="w-full px-4 py-2 bg-[#2a2a2a] text-white border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+        {/* Banner URL */}
+        <label className="block mb-2 text-sm text-gray-300">
+          Channel Banner URL
+        </label>
+        <input
+          name="channelBanner"
+          value={form.channelBanner}
+          onChange={handleChange}
+          placeholder="https://example.com/banner.jpg"
+          className="w-full mb-6 px-4 py-2 bg-[#2a2a2a] text-white border rounded focus:ring-2 focus:ring-blue-500"
+        />
 
         <button
           type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-semibold transition duration-200"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-semibold transition"
         >
           Create Channel
         </button>

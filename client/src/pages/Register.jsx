@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from '../api/axios';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext'; // Only if using AuthContext
 
 const Register = () => {
   const [form, setForm] = useState({ username: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const { setAuth } = useContext(AuthContext); // Only if you want to store auth globally
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -21,11 +24,23 @@ const Register = () => {
 
     setLoading(true);
     try {
-      await axios.post('/auth/register', form);
-      alert('Registered successfully! Please login.');
+      const { username, email, password } = form;
+
+      const res = await axios.post('/auth/register', {
+        username,
+        email,
+        password,
+      });
+
+      const { token, user, channel } = res.data;
+
+      localStorage.setItem('token', token);
+      setAuth && setAuth({ user, token }); // only if AuthContext is set up
+
       navigate('/login');
     } catch (err) {
-      alert(err.response?.data?.message || 'Registration failed');
+      console.error('Frontend registration error:', err.response?.data || err);
+      alert(err.response?.data?.msg || 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -74,7 +89,7 @@ const Register = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 bg-red-500 text-white font-semibold rounded hover:bg-blue-600 transition duration-200"
+          className="w-full py-3 bg-red-500 text-white font-semibold rounded hover:bg-red-600 transition duration-200"
         >
           {loading ? 'Registering...' : 'Register'}
         </button>

@@ -2,27 +2,44 @@ import Channel from '../models/Channel.js';
 import Video from '../models/Video.js';
 
 // Create a channel
+// controllers/channelController.js
 export const createChannel = async (req, res) => {
+  if (!req.user?._id) {
+    return res.status(401).json({ message: 'Unauthorized: user not authenticated' });
+  }
+
   try {
     const existing = await Channel.findOne({ owner: req.user._id });
     if (existing) {
-      return res.status(400).json({ message: 'Channel already exists' });
+      return res.status(400).json({ message: 'Channel already exists for this user' });
     }
 
     const newChannel = new Channel({
       channelName: req.body.channelName,
       owner: req.user._id,
       description: req.body.description,
-      channelBanner: req.body.channelBanner,
+      channelBanner: req.body.channelBanner
     });
 
     const saved = await newChannel.save();
     res.status(201).json(saved);
   } catch (err) {
     console.error('Create Channel Error:', err);
+
+    if (err.code === 11000 && err.keyPattern?.owner) {
+      return res.status(400).json({ message: 'Channel already exists for this user' });
+    }
+    if (err.name === 'ValidationError') {
+      const errors = {};
+      Object.keys(err.errors).forEach((key) => {
+        errors[key] = err.errors[key].message;
+      });
+      return res.status(400).json({ message: 'Validation failed', errors });
+    }
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 // Get channel by ID with videos
 export const getChannelById = async (req, res) => {
