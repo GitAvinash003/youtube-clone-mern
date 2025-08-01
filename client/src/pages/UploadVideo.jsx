@@ -30,6 +30,8 @@ const UploadVideo = () => {
     fetchMyChannel();
   }, [navigate]);
 
+  
+
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -37,7 +39,7 @@ const UploadVideo = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      const res = await axios.post('/channel-videos', form);
+      //const res = await axios.post('/channel-videos', form);
       alert('Video uploaded successfully!');
       navigate('/my-channel'); // (or your ChannelPage route path)
     } catch (err) {
@@ -90,6 +92,7 @@ const UploadVideo = () => {
           placeholder="Video URL"
           value={form.videoUrl}
           onChange={handleChange}
+          
           className="w-full p-3 border border-gray-300 rounded mb-4"
           required
         />

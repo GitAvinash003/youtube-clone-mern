@@ -6,11 +6,25 @@ export const uploadVideoToChannel = async (req, res) => {
     const channel = await Channel.findOne({ owner: req.user._id });
     if (!channel) return res.status(404).json({ message: 'Channel not found' });
 
+    // Extract and convert to embed format
+    const convertToEmbedUrl = (url) => {
+      const shortMatch = url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
+      const longMatch = url.match(/v=([a-zA-Z0-9_-]+)/);
+      const embedMatch = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/);
+      const id = shortMatch?.[1] || longMatch?.[1] || embedMatch?.[1];
+      return id ? `https://www.youtube.com/embed/${id}` : null;
+    };
+
+    const embedUrl = convertToEmbedUrl(req.body.videoUrl);
+    if (!embedUrl) {
+      return res.status(400).json({ message: 'Invalid YouTube URL format' });
+    }
+
     const newVideo = new Video({
       title: req.body.title,
       description: req.body.description,
       thumbnailUrl: req.body.thumbnailUrl,
-      videoUrl: req.body.videoUrl,
+      videoUrl: embedUrl,
       uploader: req.user._id,
       channelId: channel._id,
     });
@@ -22,6 +36,7 @@ export const uploadVideoToChannel = async (req, res) => {
     res.status(500).json({ message: 'Failed to upload video' });
   }
 };
+
 
 export const getChannelVideos = async (req, res) => {
   try {

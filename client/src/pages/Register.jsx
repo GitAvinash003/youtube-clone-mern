@@ -32,7 +32,7 @@ const Register = () => {
         password,
       });
 
-      const { token, user, channel } = res.data;
+      const { token, user } = res.data;
 
       localStorage.setItem('token', token);
       setAuth && setAuth({ user, token }); // only if AuthContext is set up
