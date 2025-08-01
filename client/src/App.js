@@ -12,7 +12,7 @@ import ChannelPage from './pages/ChannelPage';
 import EditChannel from './pages/EditChannel';
 import UploadVideo from './pages/UploadVideo';
 import EditVideo from './pages/EditVideo';
-
+import NotFound from './pages/NotFound';
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -43,6 +43,8 @@ function App() {
               <Route path="/my-channel" element={<ChannelPage />} />
               <Route path="/upload-video" element={<UploadVideo />} />
               <Route path="/edit-video/:videoId" element={<EditVideo />} />
+              <Route path="*" element={<NotFound />} />
+
             </Routes>
           </main>
         </div>

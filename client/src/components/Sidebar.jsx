@@ -41,6 +41,7 @@ const Sidebar = ({ isOpen }) => {
         >
           <span className="text-xl mb-1">{icon}</span>
           <span className="whitespace-nowrap">{label}</span>
+          
         </NavLink>
       ))}
     </aside>
