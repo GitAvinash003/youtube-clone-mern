@@ -2,7 +2,7 @@ import React, { useContext, useState, useRef } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { FaUserCircle } from 'react-icons/fa';
-import { PiYoutubeLogoFill } from 'react-icons/pi'; // Optional: YouTube icon
+import { PiYoutubeLogoFill } from 'react-icons/pi';
 
 const Header = ({ toggleSidebar, onSearch }) => {
   const { user, logout } = useContext(AuthContext);
@@ -21,26 +21,27 @@ const Header = ({ toggleSidebar, onSearch }) => {
     }, 150);
   };
 
-
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-[#202020] text-white flex items-center justify-between px-4 py-2 shadow-md">
-      {/* Left: Sidebar Toggle + Logo */}
+      {/* Left: Toggle + Logo */}
       <div className="flex items-center gap-3">
         <button
           onClick={toggleSidebar}
-          className="text-2xl  mx-4sm:block"
+          className="text-2xl z-50 relative"
           aria-label="Toggle Sidebar"
         >
           ☰
         </button>
         <Link to="/" className="flex items-center gap-1 text-white">
           <PiYoutubeLogoFill className="text-2xl text-red-600 mx-3" />
-          <span className="font-bold text-lg  hidden sm:inline ">YouTube Clone</span>
+          <span className="font-bold text-lg hidden sm:inline">
+            YouTube Clone
+          </span>
         </Link>
       </div>
 
-      {/* Middle: Search Bar */}
-      <div className=" sm:flex flex-1 justify-center px-2">
+      {/* Middle: Search */}
+      <div className="sm:flex flex-1 justify-center px-2">
         <input
           type="text"
           placeholder="Search"
@@ -49,7 +50,7 @@ const Header = ({ toggleSidebar, onSearch }) => {
         />
       </div>
 
-      {/* Right: Auth Controls */}
+      {/* Right: Auth */}
       <div className="flex items-center gap-3 relative ml-auto">
         {user ? (
           <div
@@ -64,10 +65,7 @@ const Header = ({ toggleSidebar, onSearch }) => {
 
             {showDropdown && (
               <div className="absolute right-0 mt-2 w-40 bg-white text-black rounded shadow-md z-50">
-                <Link
-                  to="/my-channel"
-                  className="block px-4 py-2 hover:bg-gray-200"
-                >
+                <Link to="/my-channel" className="block px-4 py-2 hover:bg-gray-200">
                   My Channel
                 </Link>
                 <button
