@@ -21,25 +21,26 @@ const Header = ({ toggleSidebar, onSearch }) => {
     }, 150);
   };
 
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-[#202020] text-white flex items-center justify-between px-4 py-2 shadow-md">
       {/* Left: Sidebar Toggle + Logo */}
       <div className="flex items-center gap-3">
         <button
           onClick={toggleSidebar}
-          className="text-2xl sm:block"
+          className="text-2xl  mx-4sm:block"
           aria-label="Toggle Sidebar"
         >
           ☰
         </button>
         <Link to="/" className="flex items-center gap-1 text-white">
-          <PiYoutubeLogoFill className="text-2xl text-red-600" />
-          <span className="font-bold text-lg sm:inline hidden">YouTube Clone</span>
+          <PiYoutubeLogoFill className="text-2xl text-red-600 mx-3" />
+          <span className="font-bold text-lg  hidden sm:inline ">YouTube Clone</span>
         </Link>
       </div>
 
       {/* Middle: Search Bar */}
-      <div className="hidden sm:flex flex-1 justify-center px-2">
+      <div className=" sm:flex flex-1 justify-center px-2">
         <input
           type="text"
           placeholder="Search"
