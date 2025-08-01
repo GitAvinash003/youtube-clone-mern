@@ -2,6 +2,7 @@ import React, { useContext, useState, useRef } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { FaUserCircle } from 'react-icons/fa';
+
 import { PiYoutubeLogoFill } from 'react-icons/pi';
 
 const Header = ({ toggleSidebar, onSearch }) => {
@@ -64,16 +65,18 @@ const Header = ({ toggleSidebar, onSearch }) => {
             </button>
 
             {showDropdown && (
-              <div className="absolute right-0 mt-2 w-40 bg-white text-black rounded shadow-md z-50">
-                <Link to="/my-channel" className="block px-4 py-2 hover:bg-gray-200">
+              <div className="absolute right-0 mt-2 w-40  bg-gray-800 border-b-3 text-white rounded shadow-md z-50">
+                <Link to="/my-channel" className="block px-4 py-2 border-b-2 hover:bg-gray-200">
                   My Channel
                 </Link>
+                
                 <button
                   onClick={logout}
                   className="w-full text-left px-4 py-2 hover:bg-gray-200"
                 >
-                  Logout
+                  Logout 
                 </button>
+                 
               </div>
             )}
           </div>
