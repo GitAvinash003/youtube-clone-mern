@@ -65,7 +65,7 @@ const Header = ({ toggleSidebar, onSearch }) => {
             </button>
 
             {showDropdown && (
-              <div className="absolute right-0 mt-2 w-40  bg-gray-800 border-b-3 text-white rounded shadow-md z-50">
+              <div className="absolute right-0 mt-2 w-40  bg-gray-800  text-white rounded shadow-md z-50">
                 <Link to="/my-channel" className="block px-4 py-2 border-b-2 hover:bg-gray-200">
                   My Channel
                 </Link>
